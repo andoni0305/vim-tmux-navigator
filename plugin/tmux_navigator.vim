@@ -6,6 +6,9 @@ if exists("g:loaded_tmux_navigator") || &cp || v:version < 700
   finish
 endif
 let g:loaded_tmux_navigator = 1
+let g:yabai_integration = 1
+
+let s:yabai_direction_from_direction = {'h': 'west', 'j': 'south', 'k': 'north', 'l': 'east'}
 
 function! s:VimNavigate(direction)
   try
@@ -13,6 +16,28 @@ function! s:VimNavigate(direction)
   catch
     echohl ErrorMsg | echo 'E11: Invalid in command-line window; <CR> executes, CTRL-C quits: wincmd k' | echohl None
   endtry
+endfunction
+
+function! s:YabaiCommand(args)
+  let cmd = 'yabai -m ' . a:args
+  let l:x=&shellcmdflag
+  let &shellcmdflag='-c'
+  let retval=system(cmd)
+  let &shellcmdflag=l:x
+  return retval
+endfunction
+
+function! s:YabaiNavigate(direction)
+     call s:YabaiCommand('window --focus ' . s:yabai_direction_from_direction[a:direction])
+endfunction
+
+function! s:YabaiAwareNavigate(direction)
+    let nr = winnr()
+    call s:VimNavigate(a:direction)
+    let at_tab_page_edge = (nr == winnr())
+    if l:at_tab_page_edge
+         call s:YabaiNavigate(a:direction)
+    endif
 endfunction
 
 if !get(g:, 'tmux_navigator_no_mappings', 0)
@@ -24,13 +49,24 @@ if !get(g:, 'tmux_navigator_no_mappings', 0)
 endif
 
 if empty($TMUX)
-  command! TmuxNavigateLeft call s:VimNavigate('h')
-  command! TmuxNavigateDown call s:VimNavigate('j')
-  command! TmuxNavigateUp call s:VimNavigate('k')
-  command! TmuxNavigateRight call s:VimNavigate('l')
-  command! TmuxNavigatePrevious call s:VimNavigate('p')
-  finish
+    if exists("g:yabai_integration")
+        command! TmuxNavigateLeft call s:YabaiAwareNavigate('h')
+        command! TmuxNavigateDown call s:YabaiAwareNavigate('j')
+        command! TmuxNavigateUp call s:YabaiAwareNavigate('k')
+        command! TmuxNavigateRight call s:YabaiAwareNavigate('l')
+    else
+        command! TmuxNavigateLeft call s:VimNavigate('h')
+        command! TmuxNavigateDown call s:VimNavigate('j')
+        command! TmuxNavigateUp call s:VimNavigate('k')
+        command! TmuxNavigateRight call s:VimNavigate('l')
+
+    endif
+    command! TmuxNavigatePrevious call s:VimNavigate('p')
+
+    finish
 endif
+
+
 
 command! TmuxNavigateLeft call s:TmuxAwareNavigate('h')
 command! TmuxNavigateDown call s:TmuxAwareNavigate('j')
@@ -54,12 +90,8 @@ if !exists("g:tmux_navigator_no_wrap")
   let g:tmux_navigator_no_wrap = 0
 endif
 
-if !exists("g:yabai_integration")
-  let g:yabai_integration = 1
-endif
 
 let s:pane_position_from_direction = {'h': 'left', 'j': 'bottom', 'k': 'top', 'l': 'right'}
-let s:yabai_direction_from_direction = {'h': 'west', 'j': 'south', 'k': 'north', 'l': 'east'}
 
 function! s:TmuxOrTmateExecutable()
   return (match($TMUX, 'tmate') != -1 ? 'tmate' : 'tmux')
@@ -76,15 +108,6 @@ endfunction
 
 function! s:TmuxCommand(args)
   let cmd = s:TmuxOrTmateExecutable() . ' -S ' . s:TmuxSocket() . ' ' . a:args
-  let l:x=&shellcmdflag
-  let &shellcmdflag='-c'
-  let retval=system(cmd)
-  let &shellcmdflag=l:x
-  return retval
-endfunction
-
-function! s:YabaiCommand(args)
-  let cmd = 'yabai -m ' . a:args
   let l:x=&shellcmdflag
   let &shellcmdflag='-c'
   let retval=system(cmd)
@@ -143,7 +166,7 @@ function! s:TmuxAwareNavigate(direction)
     " if yabai is enabled jump out of vim and do a yabai jump in direction
     let is_pane_in_direction = s:TmuxCheckForPaneInDirection(a:direction) == 0
     if g:yabai_integration == 1 && l:is_pane_in_direction != 1
-        silent call s:YabaiCommand('window --focus ' . s:yabai_direction_from_direction[a:direction])
+        silent call s:YabaiNavigate(a:direction)
         return
     endif
 
