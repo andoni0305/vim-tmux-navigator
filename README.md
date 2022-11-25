@@ -38,7 +38,7 @@ install the plugin:
 Add the following line to your `~/.vimrc` file
 
 ``` vim
-Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'andoni0305/vim-tmux-navigator'
 ```
 
 Then run
@@ -50,7 +50,7 @@ Then run
 If you are using Vim 8+, you don't need any plugin manager. Simply clone this repository inside `~/.vim/pack/plugin/start/` directory and restart Vim.
 
 ```
-git clone git@github.com:christoomey/vim-tmux-navigator.git ~/.vim/pack/plugins/start/vim-tmux-navigator
+git clone git@github.com:andoni0305/vim-tmux-navigator.git ~/.vim/pack/plugins/start/vim-tmux-navigator
 ```
 
 
@@ -64,7 +64,7 @@ Add the following to your `~/.tmux.conf` file:
 
 ``` tmux
 # Smart pane switching with awareness of Vim splits.
-# See: https://github.com/christoomey/vim-tmux-navigator
+# See: https://github.com/andoni0305/vim-tmux-navigator
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
 bind-key -n 'C-h' if-shell "$is_vim" {
@@ -107,7 +107,7 @@ copying the snippet.
 When using TPM, add the following lines to your ~/.tmux.conf:
 
 ``` tmux
-set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'andoni0305/vim-tmux-navigator'
 run '~/.tmux/plugins/tpm/tpm'
 ```
 
@@ -317,7 +317,7 @@ S+   tmux
 If you encounter a different output please [open an issue][] with as much info
 about your OS, Vim version, and tmux version as possible.
 
-[open an issue]: https://github.com/christoomey/vim-tmux-navigator/issues/new
+[open an issue]: https://github.com/andoni0305/vim-tmux-navigator/issues/new
 
 ### Tmux Can't Tell if Vim Is Active
 
@@ -340,7 +340,7 @@ sources the non-interactive config.
 
 Terminal mode is currently unsupported as adding this plugin's mappings there
 causes conflict with movement mappings for FZF (it also uses terminal mode).
-There's a conversation about this in https://github.com/christoomey/vim-tmux-navigator/pull/172
+There's a conversation about this in https://github.com/andoni0305/vim-tmux-navigator/pull/172
 
 ### It Doesn't Work in tmate
 
@@ -348,7 +348,7 @@ There's a conversation about this in https://github.com/christoomey/vim-tmux-nav
 sessions. It is designed to run alongside tmux without issue, but occasionally
 there are hiccups. Specifically, if the versions of tmux and tmate don't match,
 you can have issues. See [this
-issue](https://github.com/christoomey/vim-tmux-navigator/issues/27) for more
+issue](https://github.com/andoni0305/vim-tmux-navigator/issues/27) for more
 detail.
 
 [tmate]: http://tmate.io/
