@@ -5,26 +5,10 @@ version_pat='s/^tmux[^0-9]*([.0-9]+).*/\1/p'
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
 
-tmux bind-key -n 'C-h' if-shell "$is_vim" {
-    send-keys C-h
-    } {
-    run-shell "if [ $(tmux display-message -p '#{pane_at_left}') -ne 1 ]; then tmux select-pane -L; else yabai -m window --focus west || true; fi"
-}
-tmux bind-key -n 'C-j' if-shell "$is_vim" {
-    send-keys C-j
-    } {
-    run-shell "if [ $(tmux display-message -p '#{pane_at_bottom}') -ne 1 ]; then tmux select-pane -D; else yabai -m window --focus south || true; fi"
-}
-tmux bind-key -n 'C-k' if-shell "$is_vim" {
-    send-keys C-k
-    } {
-    run-shell "if [ $(tmux display-message -p '#{pane_at_top}') -ne 1 ]; then tmux select-pane -U; else yabai -m window --focus north || true; fi"
-}
-tmux bind-key -n 'C-l' if-shell "$is_vim" {
-    send-keys C-l
-    } {
-    run-shell "if [ $(tmux display-message -p '#{pane_at_right}') -ne 1 ]; then tmux select-pane -R; else yabai -m window --focus east || true; fi"
-}
+tmux bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' "run-shell 'if [ $(tmux display-message -p '#{pane_at_left}') -ne 1 ]; then tmux select-pane -L; else yabai -m window --focus west || true; fi'"
+tmux bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' "run-shell 'if [ $(tmux display-message -p '#{pane_at_bottom}') -ne 1 ]; then tmux select-pane -D; else yabai -m window --focus south || true; fi'"
+tmux bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' "run-shell 'if [ $(tmux display-message -p '#{pane_at_top}') -ne 1 ]; then tmux select-pane -U; else yabai -m window --focus north || true; fi'"
+tmux bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' "run-shell 'if [ $(tmux display-message -p '#{pane_at_right}') -ne 1 ]; then tmux select-pane -R; else yabai -m window --focus east || true; fi'"
 tmux_version="$(tmux -V | sed -En "$version_pat")"
 tmux setenv -g tmux_version "$tmux_version"
 
