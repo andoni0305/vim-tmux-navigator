@@ -54,7 +54,12 @@ if !exists("g:tmux_navigator_no_wrap")
   let g:tmux_navigator_no_wrap = 0
 endif
 
+if !exists("g:yabai_integration")
+  let g:yabai_integration = 1
+endif
+
 let s:pane_position_from_direction = {'h': 'left', 'j': 'bottom', 'k': 'top', 'l': 'right'}
+let s:yabai_direction_from_direction = {'h': 'west', 'j': 'south', 'k': 'north', 'l': 'east'}
 
 function! s:TmuxOrTmateExecutable()
   return (match($TMUX, 'tmate') != -1 ? 'tmate' : 'tmux')
@@ -76,6 +81,19 @@ function! s:TmuxCommand(args)
   let retval=system(cmd)
   let &shellcmdflag=l:x
   return retval
+endfunction
+
+function! s:YabaiCommand(args)
+  let cmd = 'yabai -m ' . a:args
+  let l:x=&shellcmdflag
+  let &shellcmdflag='-c'
+  let retval=system(cmd)
+  let &shellcmdflag=l:x
+  return retval
+endfunction
+
+function! s:TmuxCheckForPaneInDirection(direction)
+    return s:TmuxCommand('display-message -p "#{pane_at_' . s:pane_position_from_direction[a:direction] . '}"')
 endfunction
 
 function! s:TmuxNavigatorProcessList()
@@ -122,7 +140,15 @@ function! s:TmuxAwareNavigate(direction)
       catch /^Vim\%((\a\+)\)\=:E141/ " catches the no file name error
       endtry
     endif
+    " if yabai is enabled jump out of vim and do a yabai jump in direction
+    let is_pane_in_direction = s:TmuxCheckForPaneInDirection(a:direction) == 0
+    if g:yabai_integration == 1 && l:is_pane_in_direction != 1
+        silent call s:YabaiCommand('window --focus ' . s:yabai_direction_from_direction[a:direction])
+        return
+    endif
+
     let args = 'select-pane -t ' . shellescape($TMUX_PANE) . ' -' . tr(a:direction, 'phjkl', 'lLDUR')
+
     if g:tmux_navigator_preserve_zoom == 1
       let l:args .= ' -Z'
     endif

@@ -98,6 +98,11 @@ run '~/.tmux/plugins/tpm/tpm'
 Thanks to Christopher Sexton who provided the updated tmux configuration in
 [this blog post][].
 
+#### Yabai
+
+If you have [yabai](https://github.com/koekeishiya/yabai/wiki)  installed the same key bindings will jump from vim in that direction if no
+pane is there.
+
 Configuration
 -------------
 
